@@ -36,7 +36,7 @@ interface UserState {
 const initialState: UserState = {
 	curUser: null,
 	userProfile: null,
-	cart: [],
+	cart: JSON.parse(localStorage.getItem('cart') || '[]'),
 	favorites: JSON.parse(localStorage.getItem("favorites") || "[]"),
 	formType: SIGN_UP,
 	showForm: false,
