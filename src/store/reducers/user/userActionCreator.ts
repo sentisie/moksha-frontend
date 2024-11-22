@@ -3,6 +3,7 @@ import axios from "axios";
 import { IUser, IUserLogin } from "../../../types/types";
 import { BASE_URL } from "../../../utils/constants";
 import { ICartProduct } from "./userSlice";
+import { RootState } from "../../store";
 
 export const setAuthToken = (token: string | null) => {
 	if (token) {
@@ -245,22 +246,32 @@ export const updateProfile = createAsyncThunk(
 
 export const addItemToCart = createAsyncThunk(
 	'user/addItemToCart',
-	async (item: ICartProduct, { rejectWithValue }) => {
+	async (item: ICartProduct, { getState, rejectWithValue }) => {
 		try {
-			await new Promise(resolve => setTimeout(resolve, 500));
+			const { userReducer } = getState() as RootState;
+			const currentCart = userReducer.cart;
 			
-			const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-			const existingItemIndex = cart.findIndex((cartItem: ICartProduct) => cartItem.id === item.id);
+			const totalQuantity = currentCart.reduce((sum, cartItem) => 
+				sum + (cartItem.id === item.id ? 0 : cartItem.quantity), 
+				0) + item.quantity;
 			
-			if (existingItemIndex !== -1) {
-				cart[existingItemIndex] = item;
-			} else {
-				cart.push(item);
+			if (totalQuantity > 200) {
+				throw new Error('Превышен лимит товаров в корзине (максимум 200)');
 			}
 			
-			localStorage.setItem('cart', JSON.stringify(cart));
+			const existingItemIndex = currentCart.findIndex(cartItem => cartItem.id === item.id);
+			const newCart = existingItemIndex !== -1
+				? currentCart.map(cartItem => 
+					cartItem.id === item.id ? item : cartItem)
+				: [...currentCart, item];
+			
+			localStorage.setItem('cart', JSON.stringify(newCart));
+			
 			return item;
 		} catch (error) {
+			if (error instanceof Error) {
+				return rejectWithValue(error.message);
+			}
 			return rejectWithValue('Ошибка при добавлении товара в корзину');
 		}
 	}

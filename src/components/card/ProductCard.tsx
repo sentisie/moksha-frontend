@@ -91,26 +91,26 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 		event.preventDefault();
 		event.stopPropagation();
 		
-		const totalQuantityInCart = cart.reduce((sum, cartItem) => sum + cartItem.quantity, 0);
-		
-		if (totalQuantityInCart >= 200) {
-			toast.warning('Превышен лимит товаров в корзине (максимум 200)');
-			return;
-		}
-		
-		dispatch(addItemToCart({ ...item, quantity: 1 }));
-		toast.success(
-			<>
-				Добавлено в корзину: <br /> {item.title}
-			</>,
-			{
-				icon: <img src={item.images[0]} alt={item.title} />,
-				onClick: () => {
-					window.location.href = "/cart";
-				},
-				className: "cartToast",
+		try {
+			const result = await dispatch(addItemToCart({ ...item, quantity: 1 })).unwrap();
+			
+			if (result) {
+				toast.success(
+					<>
+						Добавлено в корзину: <br /> {item.title}
+					</>,
+					{
+						icon: <img src={item.images[0]} alt={item.title} />,
+						onClick: () => {
+							window.location.href = "/cart";
+						},
+						className: "cartToast",
+					}
+				);
 			}
-		);
+		} catch (error) {
+			toast.error(typeof error === 'string' ? error : 'Ошибка при добавлении товара в корзину');
+		}
 	};
 
 	const deliveryInfo = deliveryInfos?.find(
