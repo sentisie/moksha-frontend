@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import classes from "./OrderTracking.module.scss";
 import MyButton from "../../UI/button/MyButton";
 import { toast } from "react-toastify";
@@ -10,23 +10,38 @@ interface OrderTrackingProps {
 }
 
 const OrderTracking: FC<OrderTrackingProps> = ({ orders, onStatusUpdate }) => {
+	const [loadingStates, setLoadingStates] = useState<{ [key: number]: boolean }>({});
 	const activeOrders = orders.filter((order) => order.status === "new");
 
 	const handleCancel = async (orderId: number) => {
 		try {
+			setLoadingStates(prev => ({ ...prev, [orderId]: true }));
 			await onStatusUpdate(orderId, "cancelled");
 			toast.success("Заказ успешно отменен");
 		} catch (error) {
-			toast.error("Ошибка при отмене заказа");
+				toast.error("Ошибка при отмене заказа");
+		} finally {
+			setLoadingStates(prev => {
+				const newState = { ...prev };
+				delete newState[orderId];
+				return newState;
+			});
 		}
 	};
 
 	const handleDelivered = async (orderId: number) => {
 		try {
+			setLoadingStates(prev => ({ ...prev, [orderId]: true }));
 			await onStatusUpdate(orderId, "delivered");
 			toast.success("Заказ отмечен как полученный");
 		} catch (error) {
-			toast.error("Ошибка при обновлении статуса заказа");
+				toast.error("Ошибка при обновлении статуса заказа");
+		} finally {
+			setLoadingStates(prev => {
+				const newState = { ...prev };
+				delete newState[orderId];
+				return newState;
+			});
 		}
 	};
 
@@ -83,14 +98,20 @@ const OrderTracking: FC<OrderTrackingProps> = ({ orders, onStatusUpdate }) => {
 									<MyButton
 										onClick={() => handleDelivered(order.id)}
 										className={classes.deliveredButton}
+										disabled={!!loadingStates[order.id]}
 									>
-										Заказ получен
+										{loadingStates[order.id] 
+											? 'Обработка...' 
+											: 'Заказ получен'}
 									</MyButton>
 									<MyButton
 										onClick={() => handleCancel(order.id)}
 										className={classes.cancelButton}
+										disabled={!!loadingStates[order.id]}
 									>
-										Отменить заказ
+										{loadingStates[order.id]
+											? 'Отмена...' 
+											: 'Отменить заказ'}
 									</MyButton>
 								</div>
 							</div>

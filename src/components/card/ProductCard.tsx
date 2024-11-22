@@ -68,22 +68,24 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
 	const isInCart = cart.some((cartItem) => cartItem.id === item.id);
 
-	const handleFavoriteClick = async (
-		event: React.MouseEvent<HTMLButtonElement>
-	) => {
+	const handleFavoriteClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();
-
+		
 		if (!curUser) {
 			toast.warning("Авторизуйтесь, чтобы добавить товар в избранное");
 			return;
 		}
-
-		if (isFavorite) {
-			await dispatch(removeFavorite(item.id));
-			toast.info("Товар удален из избранного");
-		} else {
-			await dispatch(addFavorite(item.id)).unwrap();
-			toast.success("Товар добавлен в избранное");
+		
+		try {
+			if (isFavorite) {
+				await dispatch(removeFavorite(item.id)).unwrap();
+				toast.info("Товар удален из избранного");
+			} else {
+				await dispatch(addFavorite(item.id)).unwrap();
+				toast.success("Товар добавлен в избранное");
+			}
+		} catch (error) {
+			toast.error(typeof error === 'string' ? error : 'Ошибка при обновлении избранного');
 		}
 	};
 

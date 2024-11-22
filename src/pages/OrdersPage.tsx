@@ -23,7 +23,11 @@ const OrdersPage: FC = () => {
 	const [updateStatus] = useUpdateOrderStatusMutation();
 
 	const handleStatusUpdate = async (orderId: number, status: OrderStatus) => {
-		await updateStatus({ orderId, status }).unwrap();
+		try {
+			await updateStatus({ orderId, status }).unwrap();
+		} catch (error) {
+			throw new Error('Ошибка при обновлении статуса заказа');
+		}
 	};
 
 	if (!isAuthChecked || isLoading) {

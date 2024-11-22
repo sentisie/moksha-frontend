@@ -2,8 +2,11 @@ import { FC, useEffect, useState } from "react";
 import Cart from "../components/cart/Cart";
 import Products from "../components/products/Products";
 import { useGetProductsByIdsQuery } from "../services/ProductServices";
+import { useAppSelector } from "../hooks/redux";
+import Loader from "../UI/loaders/main-loader/Loader";
 
 const CartPage: FC = () => {
+	const { isCartLoading } = useAppSelector((state) => state.userReducer);
 	const [viewedProductIds, setViewedProductIds] = useState<number[]>([]);
 
 	const { data: viewedProducts, isLoading: isViewedProductsLoading } =
@@ -17,6 +20,16 @@ const CartPage: FC = () => {
 			setViewedProductIds(JSON.parse(saved));
 		}
 	}, []);
+
+	if (isCartLoading) {
+		return (
+			<div className="container">
+				<div className="loaderContainer">
+					<Loader />
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<>

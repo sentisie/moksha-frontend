@@ -143,17 +143,22 @@ const Product: FC<IProduct> = (item) => {
 	const { favorites } = useAppSelector((state) => state.favoritesReducer);
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
 
-	const handleFavoriteClick = () => {
+	const handleFavoriteClick = async () => {
 		if (!curUser) {
 			toast.warning("Авторизуйтесь, чтобы добавить товар в избранное");
 			return;
 		}
-		if (isFavorite) {
-			dispatch(removeFavorite(item.id));
-			toast.info("Товар удален из избранного");
-		} else {
-			dispatch(addFavorite(item.id));
-			toast.success("Товар добавлен в избранное");
+		
+		try {
+			if (isFavorite) {
+				await dispatch(removeFavorite(item.id)).unwrap();
+				toast.info("Товар удален из избранного");
+			} else {
+				await dispatch(addFavorite(item.id)).unwrap();
+				toast.success("Товар добавлен в избранное");
+			}
+		} catch (error) {
+			toast.error(typeof error === 'string' ? error : 'Ошибка при обновлении избранного');
 		}
 	};
 
