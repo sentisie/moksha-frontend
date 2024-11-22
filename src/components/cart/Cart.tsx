@@ -28,6 +28,7 @@ import {
 } from "../../store/reducers/user/userActionCreator";
 import { DeliveryTimeRequestData } from "../../types/types";
 import { useGetUserOrdersQuery } from "../../services/OrderService";
+import useDebounce from "../../hooks/useDeboune";
 
 const Cart: FC = () => {
 	const dispatch = useAppDispatch();
@@ -247,12 +248,14 @@ const Cart: FC = () => {
 		}
 	}, [curUser, dispatch, hasMergedCarts, cart]);
 
+	const debouncedCart = useDebounce(cart, 5000);
+
 	useEffect(() => {
-		if (curUser && !isMergingCarts && !isEqual(cart, prevCart)) {
-			dispatch(saveCart(cart));
-			setPrevCart(cart);
+		if (curUser && !isMergingCarts && !isEqual(debouncedCart, prevCart)) {
+			dispatch(saveCart(debouncedCart));
+			setPrevCart(debouncedCart);
 		}
-	}, [cart, prevCart, dispatch, curUser, isMergingCarts]);
+	}, [debouncedCart, prevCart, dispatch, curUser, isMergingCarts]);
 
 	const mergeCarts = (
 		serverCart: ICartProduct[],

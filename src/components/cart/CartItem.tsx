@@ -36,6 +36,7 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 	const selectedItems = useAppSelector(
 		(state) => state.deliveryReducer.selectedItems
 	);
+	const cart = useAppSelector((state) => state.userReducer.cart);
 	const isSelected = selectedItems.includes(item.id);
 	const { favorites } = useAppSelector((state) => state.favoritesReducer);
 	const { curUser } = useAppSelector((state) => state.userReducer);
@@ -88,6 +89,18 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 		try {
 			if (newQuantity <= 0) {
 				dispatch(removeItemFromCart(item.id));
+				return;
+			}
+			
+			const totalQuantityInCart = cart.reduce((sum, cartItem) => {
+				if (cartItem.id === item.id) {
+					return sum;
+				}
+				return sum + cartItem.quantity;
+			}, 0);
+			
+			if (totalQuantityInCart + newQuantity > 200) {
+				toast.warning('Превышен лимит товаров в корзине (максимум 200)');
 				return;
 			}
 			

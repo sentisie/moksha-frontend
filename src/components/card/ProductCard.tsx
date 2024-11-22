@@ -62,7 +62,7 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 				item.price - (item.price * item.discount.percentage) / 100,
 				currency,
 				rates
-		)
+		  )
 		: null;
 
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
@@ -87,11 +87,30 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 		}
 	};
 
-	const handleAddToCart = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleAddToCart = async (event: React.MouseEvent<HTMLButtonElement>) => {
 		event.preventDefault();
 		event.stopPropagation();
+		
+		const totalQuantityInCart = cart.reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+		
+		if (totalQuantityInCart >= 200) {
+			toast.warning('Превышен лимит товаров в корзине (максимум 200)');
+			return;
+		}
+		
 		dispatch(addItemToCart({ ...item, quantity: 1 }));
-		toast.success(`Товар "${item.title}" добавлен в корзину`);
+		toast.success(
+			<>
+				Добавлено в корзину: <br /> {item.title}
+			</>,
+			{
+				icon: <img src={item.images[0]} alt={item.title} />,
+				onClick: () => {
+					window.location.href = "/cart";
+				},
+				className: "cartToast",
+			}
+		);
 	};
 
 	const deliveryInfo = deliveryInfos?.find(
@@ -149,9 +168,7 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 							xmlns="http://www.w3.org/2000/svg"
 						>
 							<title>heart-solid</title>
-							<path
-								d="M33,7.64c-1.34-2.75-5.2-5-9.69-3.69A9.87,9.87,0,0,0,18,7.72a9.87,9.87,0,0,0-5.31-3.77C8.19,2.66,4.34,4.89,3,7.64c-1.88,3.85-1.1,8.18,2.32,12.87C8,24.18,11.83,27.9,17.39,32.22a1,1,0,0,0,1.23,0c5.55-4.31,9.39-8,12.07-11.71C34.1,15.82,34.88,11.49,33,7.64Z"
-							></path>
+							<path d="M33,7.64c-1.34-2.75-5.2-5-9.69-3.69A9.87,9.87,0,0,0,18,7.72a9.87,9.87,0,0,0-5.31-3.77C8.19,2.66,4.34,4.89,3,7.64c-1.88,3.85-1.1,8.18,2.32,12.87C8,24.18,11.83,27.9,17.39,32.22a1,1,0,0,0,1.23,0c5.55-4.31,9.39-8,12.07-11.71C34.1,15.82,34.88,11.49,33,7.64Z"></path>
 							<rect x="0" y="0" width="36" height="36" fill-opacity="0" />
 						</svg>
 					) : (
@@ -202,8 +219,8 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 					</Link>
 				) : (
 					showAddToCartButton && (
-						<MyButton 
-							className={classes.addToCart} 
+						<MyButton
+							className={classes.addToCart}
 							onClick={handleAddToCart}
 							disabled={item.quantity === 0}
 						>
@@ -212,13 +229,9 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 							) : deliveryInfo ? (
 								<span>{formatDeliveryDate(deliveryInfo.deliveryDays)}</span>
 							) : !location ? (
-								<span className={classes.deliveryLoading}>
-									В корзину
-								</span>
+								<span className={classes.deliveryLoading}>В корзину</span>
 							) : (
-								<span className={classes.deliveryLoading}>
-									Загрузка...
-								</span>
+								<span className={classes.deliveryLoading}>Загрузка...</span>
 							)}
 						</MyButton>
 					)

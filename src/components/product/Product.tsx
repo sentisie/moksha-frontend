@@ -73,7 +73,18 @@ const Product: FC<IProduct> = (item) => {
 			};
 
 			await dispatch(addItemToCart(cartItem)).unwrap();
-			toast.success("Товар успешно добавлен в корзину");
+			toast.success(
+				<>
+					Добавлено в корзину: <br /> {title}
+				</>,
+				{
+					icon: <img src={images[0]} alt={title} />,
+					onClick: () => {
+						window.location.href = "/cart";
+					},
+					className: "cartToast",
+				}
+			);
 		} catch (error) {
 			toast.error("Ошибка при добавлении товара в корзину");
 		} finally {
