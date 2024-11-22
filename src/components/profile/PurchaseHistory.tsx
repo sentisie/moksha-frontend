@@ -47,7 +47,7 @@ const PurchaseHistory: FC<PurchaseHistoryProps> = ({ purchases }) => {
 							className={classes.orderCard}
 						>
 							<div className={classes.orderHeader}>
-								<span>Заказ №{order.order_number}</span>
+								<span>Заказ №{order.order_id}</span>
 								<span>{new Date(order.date).toLocaleDateString()}</span>
 								<span
 									className={`${classes.status} ${getStatusClass(
