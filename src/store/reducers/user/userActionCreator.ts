@@ -114,7 +114,13 @@ export const saveCart = createAsyncThunk(
 
 export const loadCart = createAsyncThunk(
 	"users/loadCart",
-	async (_, thunkAPI) => {
+	async (_, { getState }) => {
+		const state = getState() as RootState;
+		
+		if (state.userReducer.isCartLoading) {
+			return state.userReducer.cart;
+		}
+
 		try {
 			const token = localStorage.getItem("token");
 			if (!token) {
@@ -127,7 +133,13 @@ export const loadCart = createAsyncThunk(
 			if (axios.isAxiosError(err)) {
 				errorMessage = err.response?.data?.message || errorMessage;
 			}
-			return thunkAPI.rejectWithValue(errorMessage);
+			throw new Error(errorMessage);
+		}
+	},
+	{
+		condition: (_, { getState }) => {
+			const state = getState() as RootState;
+			return !state.userReducer.isCartLoading;
 		}
 	}
 );
