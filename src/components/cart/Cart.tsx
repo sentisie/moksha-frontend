@@ -28,10 +28,11 @@ import {
 } from "../../store/reducers/user/userActionCreator";
 import { DeliveryTimeRequestData } from "../../types/types";
 import { useGetUserOrdersQuery } from "../../services/OrderService";
+import Loader from "../../UI/loaders/main-loader/Loader";
 
 const Cart: FC = () => {
 	const dispatch = useAppDispatch();
-	const { cart, curUser } = useAppSelector((state) => state.userReducer);
+	const { cart, curUser, isCartLoading } = useAppSelector((state) => state.userReducer);
 	const { location, selectedItems } = useAppSelector(
 		(state) => state.deliveryReducer
 	);
@@ -276,7 +277,11 @@ const Cart: FC = () => {
 	return (
 		<section className={classes.cart}>
 			<div className="container">
-				{cart.length === 0 ? (
+				{isCartLoading ? (
+					<div className={classes.loaderContainer}>
+						<Loader />
+					</div>
+				) : cart.length === 0 ? (
 					<div style={{ paddingBlock: "60px" }}>
 						<h2 className="h2-title">Ваша корзина пуста</h2>
 						<p className={classes.title}>Но это легко исправить 🙂</p>
