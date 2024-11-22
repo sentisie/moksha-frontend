@@ -1,0 +1,43 @@
+@import "../../../styles/mixins", "../../../styles/media";
+
+.modal {
+	background-color: var(--main-bg-color);
+	width: 100%;
+	padding: 2.1875rem 1.5625rem;
+	text-align: center;
+
+	.title {
+		margin-bottom: 1.5rem;
+	}
+	.form {
+		& > *:not(:last-child) {
+			margin-bottom: 0.9375rem;
+		}
+		.group {
+			&:not(:last-child) {
+				border-radius: 0.625rem;
+				overflow: hidden;
+				margin-bottom: 1.25rem;
+			}
+		}
+		.link {
+			cursor: pointer;
+			opacity: 0.6;
+			transition: 0.2s ease-in-out;
+			@include hover {
+				opacity: 1;
+			}
+		}
+		.submit {
+			width: 100%;
+		}
+		.logout {
+			width: 100%;
+			background-color: rgb(111, 65, 111);
+			@include hover {
+				background-color: var(--main-accent-color);
+				color: #fff;
+			}
+		}
+	}
+}

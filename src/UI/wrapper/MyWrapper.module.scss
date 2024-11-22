@@ -1,0 +1,7 @@
+.myWrapper {
+	background-color: var(--main-bg-color);
+	color: var(--main-text-color);
+	&:not(:last-child) {
+		margin-bottom: 1rem;
+	}
+}

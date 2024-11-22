@@ -1,0 +1,66 @@
+.switchContainer {
+	display: flex;
+	margin-bottom: 1rem;
+	border-radius: 1rem;
+	overflow: hidden;
+
+	.switchButton {
+		flex: 1;
+		padding: 0.8rem;
+		cursor: pointer;
+		background-color: var(--main-bg-color);
+		border: none;
+		font-size: 1rem;
+		color: var(--main-text-color);
+		transition: background-color 0.2s, color 0.2s;
+
+		&:hover {
+			background-color: var(--third-bg-color);
+		}
+
+		&.active {
+			background-color: var(--btn-color);
+			color: var(--secondary-text-color);
+		}
+	}
+}
+
+.speedButton {
+	flex: 1;
+	padding: 0.8rem;
+	cursor: pointer;
+	background-color: var(--main-bg-color);
+	border: none;
+	border-radius: 0.5rem;
+	font-size: 1rem;
+	color: var(--main-text-color);
+	transition: background-color 0.2s, color 0.2s;
+
+	&:hover {
+		background-color: var(--hover-accent-color);
+		color: var(--secondary-text-color);
+	}
+
+	&.active {
+		background-color: var(--btn-color);
+		color: var(--secondary-text-color);
+	}
+}
+
+.modalBottom {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	.modalButton {
+		margin-left: auto;
+		&:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		&:hover:not(:disabled) {
+			opacity: 0.9;
+		}
+	}
+}
