@@ -66,27 +66,45 @@ const Product: FC<IProduct> = (item) => {
 	const handleAddToCart = async () => {
 		try {
 			setIsAddingToCart(true);
+			
+			const totalQuantityInCart = cart.reduce((sum, cartItem) => sum + cartItem.quantity, 0);
+			
+			if (totalQuantityInCart >= 200) {
+				toast.warning(
+					<>
+						<div>Лимит товаров</div>
+						<div className="toast-details">
+							Максимальное количество в корзине: 200 шт.
+						</div>
+					</>
+				);
+				return;
+			}
 
 			const cartItem = {
 				...item,
 				quantity: 1,
 			};
 
-			await dispatch(addItemToCart(cartItem)).unwrap();
-			toast.success(
-				<>
-					Добавлено в корзину: <br /> {title}
-				</>,
-				{
-					icon: <img src={images[0]} alt={title} />,
-					onClick: () => {
-						window.location.href = "/cart";
-					},
-					className: "cartToast",
-				}
-			);
+			const result = await dispatch(addItemToCart(cartItem)).unwrap();
+			
+			if (result) {
+				setIsInCart(true);
+				toast.success(
+					<>
+						Добавлено в корзину: <br /> {title}
+					</>,
+					{
+						icon: <img src={images[0]} alt={title} />,
+						onClick: () => {
+							window.location.href = "/cart";
+						},
+						className: "cartToast",
+					}
+				);
+			}
 		} catch (error) {
-			toast.error("Ошибка при добавлении товара в корзину");
+			toast.error(typeof error === 'string' ? error : 'Ошибка при добавлении товара в корзину');
 		} finally {
 			setIsAddingToCart(false);
 		}

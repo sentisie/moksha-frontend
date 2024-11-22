@@ -267,6 +267,11 @@ export const addItemToCart = createAsyncThunk(
 			
 			localStorage.setItem('cart', JSON.stringify(newCart));
 			
+			const token = localStorage.getItem('token');
+			if (token) {
+				await axios.post(`${BASE_URL}/cart`, { cart: newCart });
+			}
+			
 			return item;
 		} catch (error) {
 			if (error instanceof Error) {
