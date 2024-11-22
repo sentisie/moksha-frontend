@@ -39,18 +39,22 @@ const Event11Page: FC = () => {
 
 	return (
 		<>
-			{products && products.length ? (
+			{isLoading ? (
+				<div className="loader-container">
+					<Loader />
+				</div>
+			) : products && products.length ? (
 				<Products
 					title="Скидки 11.11"
 					products={products || []}
 					isLoading={isLoading}
 					error={error ? "Ошибка при загрузке продуктов" : null}
 				/>
-			) : (
+			) : !isLoading && !isFetching ? (
 				<div>Товары не найдены</div>
-			)}
+			) : null}
 			{hasMore && <div ref={lastElement} />}
-			{isFetching && <Loader />}
+			{isFetching && !isLoading && <Loader />}
 		</>
 	);
 };

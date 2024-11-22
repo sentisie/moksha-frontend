@@ -202,8 +202,14 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 					</Link>
 				) : (
 					showAddToCartButton && (
-						<MyButton className={classes.addToCart} onClick={handleAddToCart}>
-							{deliveryInfo ? (
+						<MyButton 
+							className={classes.addToCart} 
+							onClick={handleAddToCart}
+							disabled={item.quantity === 0}
+						>
+							{item.quantity === 0 ? (
+								<span>Нет в наличии</span>
+							) : deliveryInfo ? (
 								<span>{formatDeliveryDate(deliveryInfo.deliveryDays)}</span>
 							) : !location ? (
 								<span className={classes.deliveryLoading}>
@@ -211,7 +217,7 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 								</span>
 							) : (
 								<span className={classes.deliveryLoading}>
-									Загрузка информации о доставке...
+									Загрузка...
 								</span>
 							)}
 						</MyButton>

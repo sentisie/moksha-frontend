@@ -34,7 +34,6 @@ const Product: FC<IProduct> = (item) => {
 		discount,
 	} = item;
 	const [curImage, setCurImage] = useState<string>();
-	const [curSize, setCurSize] = useState<number | null>(null);
 	const [isInCart, setIsInCart] = useState(false);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -46,7 +45,6 @@ const Product: FC<IProduct> = (item) => {
 	const dispatch = useAppDispatch();
 
 	const colorTranslation = useColorTranslation(title, description);
-	const sizes = [4, 4.5, 5];
 
 	const cartItem = cart.find((cartItem) => cartItem.id === item.id);
 	const currentQuantityInCart = cartItem ? cartItem.quantity : 0;
@@ -69,14 +67,8 @@ const Product: FC<IProduct> = (item) => {
 		try {
 			setIsAddingToCart(true);
 
-			if (!curSize) {
-				toast.error("Пожалуйста, выберите размер");
-				return;
-			}
-
 			const cartItem = {
 				...item,
-				size: curSize,
 				quantity: 1,
 			};
 
@@ -158,21 +150,7 @@ const Product: FC<IProduct> = (item) => {
 						{category.name === "Clothes" && (
 							<div className={classes.sizes}>
 								<span className={classes.name}>Размеры:</span>
-								<div className={classes.list}>
-									{sizes.map((size) => (
-										<div
-											key={size}
-											onClick={() =>
-												setCurSize((prev) => (prev === size ? null : size))
-											}
-											className={`${classes.size} ${
-												curSize === size ? classes.active : ""
-											}`}
-										>
-											{size}
-										</div>
-									))}
-								</div>
+								<div className={classes.list}></div>
 							</div>
 						)}
 						<p className={classes.description}>{description}</p>

@@ -362,17 +362,16 @@ const Cart: FC = () => {
 											selectedCartItems.length === 0 ||
 											!location ||
 											!location.deliveryMode ||
-											(location.deliveryMode === "courier" && !location.address) ||
+											(location.deliveryMode === "courier" &&
+												!location.address) ||
 											loading
 										}
 									>
-										{isCheckingOut ? (
-											"Обработка..."
-										) : loading ? (
-											"Загрузка..."
-										) : (
-											"Оформить заказ"
-										)}
+										{isCheckingOut
+											? "Обработка..."
+											: loading
+											? "Загрузка..."
+											: "Оформить заказ"}
 									</MyButton>
 									<DeliveryModal
 										isOpen={isDeliveryModalOpen}
