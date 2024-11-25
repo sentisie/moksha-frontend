@@ -8,12 +8,14 @@ import { logoutUser } from "../user/userSlice";
 interface FavoritesState {
 	favorites: IFavoriteProduct[];
 	isLoading: boolean;
+	loadingItems: { [key: number]: boolean };
 	error: string | null;
 }
 
 const initialState: FavoritesState = {
 	favorites: [],
 	isLoading: false,
+	loadingItems: {},
 	error: null,
 };
 
@@ -24,6 +26,7 @@ const favoritesSlice = createSlice({
 		resetFavorites(state) {
 			state.favorites = [];
 			state.error = null;
+			state.loadingItems = {};
 		},
 	},
 	extraReducers: (builder) => {

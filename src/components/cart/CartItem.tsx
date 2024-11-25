@@ -38,9 +38,10 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 	);
 	const cart = useAppSelector((state) => state.userReducer.cart);
 	const isSelected = selectedItems.includes(item.id);
-	const { favorites } = useAppSelector((state) => state.favoritesReducer);
+	const { favorites, loadingItems } = useAppSelector((state) => state.favoritesReducer);
 	const { curUser } = useAppSelector((state) => state.userReducer);
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
+	const isItemLoading = loadingItems[item.id];
 
 	const [totalPriceSpring, totalPriceSpringApi] = useSpring(() => ({
 		number: 0,
@@ -186,12 +187,14 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 						type="button"
 						className={classes.favorite}
 						onClick={handleFavoriteClick}
+						disabled={isItemLoading}
 					>
 						{isFavorite ? (
 							<svg
 								fill="red"
 								width="20px"
 								height="20px"
+								
 								viewBox="0 0 36 36"
 								version="1.1"
 								preserveAspectRatio="xMidYMid meet"

@@ -23,7 +23,8 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 	const dispatch = useAppDispatch();
 	const { currency, rates } = useAppSelector((state) => state.currencyReducer);
 	const symbol = currencyRates[currency as keyof typeof currencyRates].symbol;
-	const { favorites } = useAppSelector((state) => state.favoritesReducer);
+	const { favorites, loadingItems } = useAppSelector((state) => state.favoritesReducer);
+	const isLoading = loadingItems[item.id];
 	const { cart, curUser } = useAppSelector((state) => state.userReducer);
 	const { location, deliverySpeed } = useAppSelector(
 		(state) => state.deliveryReducer
@@ -158,12 +159,14 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 				<button
 					className={classes.favoriteButton}
 					onClick={handleFavoriteClick}
+					disabled={isLoading}
 				>
 					{isFavorite ? (
 						<svg
 							fill="red"
 							width="20px"
 							height="20px"
+							
 							viewBox="0 0 36 36"
 							version="1.1"
 							preserveAspectRatio="xMidYMid meet"

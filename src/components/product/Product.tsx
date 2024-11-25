@@ -140,8 +140,9 @@ const Product: FC<IProduct> = (item) => {
 
 	const deliveryInfo = deliveryInfos?.find((item) => item.productId === id);
 
-	const { favorites } = useAppSelector((state) => state.favoritesReducer);
+	const { favorites, loadingItems } = useAppSelector((state) => state.favoritesReducer);
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
+	const isItemLoading = loadingItems[item.id];
 
 	const handleFavoriteClick = async () => {
 		if (!curUser) {
@@ -321,6 +322,7 @@ const Product: FC<IProduct> = (item) => {
 							<button
 								className={classes.favoriteButton}
 								onClick={handleFavoriteClick}
+								disabled={isItemLoading}
 							>
 								{isFavorite ? (
 									<svg
