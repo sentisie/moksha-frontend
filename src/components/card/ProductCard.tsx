@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FC } from "react";
 import { Link } from "react-router-dom";
 import { DeliveryTimeRequestData, IProduct } from "../../types/types";
@@ -23,8 +23,7 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 	const dispatch = useAppDispatch();
 	const { currency, rates } = useAppSelector((state) => state.currencyReducer);
 	const symbol = currencyRates[currency as keyof typeof currencyRates].symbol;
-	const { favorites, loadingItems } = useAppSelector((state) => state.favoritesReducer);
-	const isLoading = loadingItems[item.id];
+	const { favorites } = useAppSelector((state) => state.favoritesReducer);
 	const { cart, curUser } = useAppSelector((state) => state.userReducer);
 	const { location, deliverySpeed } = useAppSelector(
 		(state) => state.deliveryReducer
@@ -32,6 +31,8 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 
 	const [calculateDeliveryTime, { data: deliveryInfos }] =
 		useCalculateDeliveryTimeMutation();
+
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	useEffect(() => {
 		if (!location) return;
@@ -69,15 +70,20 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
 	const isInCart = cart.some((cartItem) => cartItem.id === item.id);
 
-	const handleFavoriteClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleFavoriteClick = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
 		event.preventDefault();
-		
+
 		if (!curUser) {
 			toast.warning("Авторизуйтесь, чтобы добавить товар в избранное");
 			return;
 		}
-		
+
+		if (isProcessing) return;
+
 		try {
+			setIsProcessing(true);
 			if (isFavorite) {
 				await dispatch(removeFavorite(item.id)).unwrap();
 				toast.info("Товар удален из избранного");
@@ -86,17 +92,25 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 				toast.success("Товар добавлен в избранное");
 			}
 		} catch (error) {
-			toast.error(typeof error === 'string' ? error : 'Ошибка при обновлении избранного');
+			toast.error(
+				typeof error === "string" ? error : "Ошибка при обновлении избранного"
+			);
+		} finally {
+			setIsProcessing(false);
 		}
 	};
 
-	const handleAddToCart = async (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleAddToCart = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
 		event.preventDefault();
 		event.stopPropagation();
-		
+
 		try {
-			const result = await dispatch(addItemToCart({ ...item, quantity: 1 })).unwrap();
-			
+			const result = await dispatch(
+				addItemToCart({ ...item, quantity: 1 })
+			).unwrap();
+
 			if (result) {
 				toast.success(
 					<>
@@ -112,7 +126,11 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 				);
 			}
 		} catch (error) {
-			toast.error(typeof error === 'string' ? error : 'Ошибка при добавлении товара в корзину');
+			toast.error(
+				typeof error === "string"
+					? error
+					: "Ошибка при добавлении товара в корзину"
+			);
 		}
 	};
 
@@ -159,14 +177,13 @@ const ProductCard: FC<ProductCardProps> = ({ item, showAddToCartButton }) => {
 				<button
 					className={classes.favoriteButton}
 					onClick={handleFavoriteClick}
-					disabled={isLoading}
+					disabled={isProcessing}
 				>
 					{isFavorite ? (
 						<svg
 							fill="red"
 							width="20px"
 							height="20px"
-							
 							viewBox="0 0 36 36"
 							version="1.1"
 							preserveAspectRatio="xMidYMid meet"

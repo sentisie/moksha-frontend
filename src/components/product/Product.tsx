@@ -36,6 +36,7 @@ const Product: FC<IProduct> = (item) => {
 	const [curImage, setCurImage] = useState<string>();
 	const [isInCart, setIsInCart] = useState(false);
 	const [isAddingToCart, setIsAddingToCart] = useState(false);
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	const { cart, curUser } = useAppSelector((state) => state.userReducer);
 	const { currency, rates } = useAppSelector((state) => state.currencyReducer);
@@ -140,17 +141,19 @@ const Product: FC<IProduct> = (item) => {
 
 	const deliveryInfo = deliveryInfos?.find((item) => item.productId === id);
 
-	const { favorites, loadingItems } = useAppSelector((state) => state.favoritesReducer);
+	const { favorites } = useAppSelector((state) => state.favoritesReducer);
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
-	const isItemLoading = loadingItems[item.id];
 
 	const handleFavoriteClick = async () => {
 		if (!curUser) {
 			toast.warning("Авторизуйтесь, чтобы добавить товар в избранное");
 			return;
 		}
+
+		if (isProcessing) return; 
 		
 		try {
+			setIsProcessing(true);
 			if (isFavorite) {
 				await dispatch(removeFavorite(item.id)).unwrap();
 				toast.info("Товар удален из избранного");
@@ -160,6 +163,8 @@ const Product: FC<IProduct> = (item) => {
 			}
 		} catch (error) {
 			toast.error(typeof error === 'string' ? error : 'Ошибка при обновлении избранного');
+		} finally {
+			setIsProcessing(false);
 		}
 	};
 
@@ -322,7 +327,7 @@ const Product: FC<IProduct> = (item) => {
 							<button
 								className={classes.favoriteButton}
 								onClick={handleFavoriteClick}
-								disabled={isItemLoading}
+								disabled={isProcessing}
 							>
 								{isFavorite ? (
 									<svg

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import {
 	removeItemFromCart,
@@ -42,6 +42,7 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 	const { curUser } = useAppSelector((state) => state.userReducer);
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
 	const isItemLoading = loadingItems[item.id];
+	const [isProcessing, setIsProcessing] = useState(false);
 
 	const [totalPriceSpring, totalPriceSpringApi] = useSpring(() => ({
 		number: 0,
@@ -136,8 +137,11 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 			toast.warning("Авторизуйтесь, чтобы добавить товар в избранное");
 			return;
 		}
+
+		if (isProcessing) return;
 		
 		try {
+			setIsProcessing(true);
 			if (isFavorite) {
 				await dispatch(removeFavorite(item.id)).unwrap();
 				toast.info("Товар удален из избранного");
@@ -147,6 +151,8 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 			}
 		} catch (error) {
 			toast.error(typeof error === 'string' ? error : 'Ошибка при обновлении избранного');
+		} finally {
+			setIsProcessing(false);
 		}
 	};
 
@@ -187,7 +193,7 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 						type="button"
 						className={classes.favorite}
 						onClick={handleFavoriteClick}
-						disabled={isItemLoading}
+						disabled={isItemLoading || isProcessing}
 					>
 						{isFavorite ? (
 							<svg
