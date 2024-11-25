@@ -1,0 +1,35 @@
+.quantity {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+
+	.input {
+		width: 6.25rem;
+		height: 3.125rem;
+		text-align: center;
+		border: 2px solid var(--icon-color);
+		border-radius: 1rem;
+		font-size: 1.25rem;
+		font-weight: 600;
+		outline: none;
+		transition: 0.2s ease;
+
+		&:focus {
+			border-color: var(--main-accent-color);
+		}
+
+		&:disabled {
+			background-color: var(--disabled-bg-color);
+			cursor: not-allowed;
+		}
+	}
+
+	.minus,
+	.plus {
+		width: 3.125rem;
+		height: 3.125rem;
+		font-size: 1.5rem;
+		padding: 0;
+	}
+}

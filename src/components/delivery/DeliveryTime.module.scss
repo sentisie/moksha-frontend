@@ -1,0 +1,27 @@
+.deliveryTime {
+	padding: 1rem;
+	background: var(--third-bg-color);
+	font-size: 12px;
+	border-radius: 0.5rem;
+	margin: 1rem 0;
+
+	.estimatedTime,
+	.deliveryDate {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+
+		span {
+			color: var(--main-text-color);
+		}
+
+		strong {
+			color: var(--main-text-color);
+		}
+	}
+}

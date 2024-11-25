@@ -1,0 +1,117 @@
+.container {
+	max-width: calc(var(--container-width) + var(--container-padding-x) * 2);
+	margin-inline: auto;
+	padding-inline: var(--container-padding-x);
+}
+
+.visually-hidden {
+	@include visually-hidden;
+}
+
+.visible {
+	visibility: visible !important;
+	opacity: 1 !important;
+	transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+
+.hidden {
+	visibility: hidden !important;
+	opacity: 0 !important;
+	transition: opacity 0.2s ease, visibility 0.2s ease !important;
+}
+
+.overlay-sidebar {
+	top: -100%;
+}
+
+.h2-title {
+	font-size: 2rem;
+	font-weight: 700;
+	line-height: 2.5rem;
+	margin-bottom: 2rem;
+}
+
+.h3-title {
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 2rem;
+	margin-bottom: 1.5rem;
+}
+
+.main-btn {
+	display: inline-block;
+	text-align: center;
+	padding: 0.875rem 2rem;
+	border-radius: 1rem;
+	background-color: var(--btn-color);
+	backdrop-filter: blur(16px);
+	color: var(--secondary-text-color);
+	font-weight: 500;
+	border: none;
+	cursor: pointer;
+	transition: 0.2s ease-in-out;
+	@include hover {
+		background-color: var(--btn-hover-color);
+		color: #fff;
+	}
+	&:disabled {
+		cursor: not-allowed;
+		background-color: rgb(113, 110, 110);
+		opacity: 0.6;
+		@include hover {
+			background-color: rgb(113, 110, 110);
+		}
+	}
+	@include hover {
+		background-color: var(--btn-hover-color);
+		color: var(--secondary-text-color);
+	}
+}
+
+.radio-btn {
+	position: relative;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+
+	&:not(:last-child) {
+		margin-bottom: 0.75rem;
+	}
+}
+
+.radio-btn input {
+	position: absolute;
+	opacity: 0;
+}
+
+.radio-btn span {
+	position: relative;
+	padding-left: 30px;
+	color: var(--main-text-color);
+	user-select: none;
+}
+
+.radio-btn span::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 20px;
+	height: 20px;
+	border: 2px solid var(--main-accent-color);
+	border-radius: 50%;
+	background-color: #fff;
+	transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.radio-btn input:checked + span::before {
+	background-color: var(--main-accent-color);
+	box-shadow: 0 0 0 4px rgba(167, 100, 252, 0.2);
+}
+
+// .hidden-mobile {
+//   @include mobile {
+//     display: none !important;
+//   }
+// }

@@ -1,0 +1,46 @@
+@import "../../styles/media";
+
+.newsletter {
+	background-color: var(--third-bg-color);
+	padding: 40px 0;
+	border-radius: 12px;
+}
+
+.content {
+	max-width: 37.5rem;
+	width: 100%;
+	margin: 0 auto;
+	text-align: center;
+	padding: 0 20px;
+}
+
+.title {
+	font-size: 1.75rem;
+	font-weight: 600;
+}
+
+.description {
+	color: var(--third-text-color);
+	margin-bottom: 1.5rem;
+}
+
+.form {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 16px;
+}
+
+.terms {
+	font-size: 0.75rem;
+	color: var(--third-text-color);
+}
+
+.link {
+	color: var(--main-accent-color);
+	text-decoration: underline;
+	transition: all 0.1s ease;
+
+	@include hover {
+		color: var(--hover-accent-color);
+	}
+}

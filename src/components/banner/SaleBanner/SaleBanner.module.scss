@@ -1,0 +1,82 @@
+.banner {
+	.container {
+		display: flex;
+		text-align: center;
+	}
+	.inner {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 2rem 2.75rem;
+		position: relative;
+		border-radius: 2rem;
+		background-color: var(--third-bg-color);
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: cover;
+
+		&::after,
+		&::before {
+			position: absolute;
+			line-height: 100px;
+			vertical-align: middle;
+			content: "-20%";
+			background: linear-gradient(
+				45deg,
+				var(--gold-color),
+				var(--star-rating-color)
+			);
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			color: transparent;
+			font-size: 5rem;
+			font-weight: 800;
+		}
+		&::before {
+			top: 80px;
+			left: 10px;
+			transform: rotate(-40deg);
+		}
+		&::after {
+			bottom: 80px;
+			right: 50px;
+			transform: rotate(-40deg);
+		}
+		.content {
+			font-size: 3.625rem;
+			line-height: 7.5rem;
+			font-weight: 900;
+			margin-bottom: 2rem;
+			text-transform: uppercase;
+			color: var(--secondary-text-color);
+			user-select: none;
+			span {
+				font-size: 6.5rem;
+				font-weight: 900;
+			}
+		}
+	}
+	.left {
+		display: flex;
+		flex-direction: column;
+		width: 50%;
+		background-repeat: no-repeat;
+		background-position: center center;
+		background-size: cover;
+		padding: 0.9375rem 2.75rem;
+		border-radius: 2rem 0 0 2rem;
+		.discount {
+			color: var(--secondary-text-color);
+			font-size: 1.125rem;
+			font-weight: 600;
+			margin-top: auto;
+			span {
+				color: var(--gold-color);
+				font-weight: 700;
+			}
+		}
+	}
+}

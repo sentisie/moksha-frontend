@@ -1,0 +1,77 @@
+.swiper-button-next,
+.swiper-button-prev,
+.swiper-button-disabled {
+	position: absolute;
+	top: 50%;
+	z-index: 10;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 3rem;
+	width: 3rem;
+	background-color: var(--inactive-text-color);
+	border-radius: 50px;
+	opacity: 0 !important;
+	transition: all 0.3s ease;
+	box-shadow: var(--pui-shadow-02);
+	z-index: 40;
+
+	@include hover {
+		background-color: var(--main-bg-color);
+	}
+}
+.swiper-button-next:after,
+.swiper-button-prev:after {
+	font-family: swiper-icons;
+	color: var(--main-accent-color);
+	font-size: 1rem;
+	font-weight: 600;
+	text-transform: none !important;
+	letter-spacing: 0;
+	text-transform: none;
+	font-variant: initial;
+	line-height: 1;
+}
+
+.swiper-button-prev,
+.swiper-rtl .swiper-button-next {
+	top: 50%;
+	left: 1.25rem;
+}
+
+.swiper-button-prev:after,
+.swiper-rtl .swiper-button-next:after {
+	content: "prev";
+}
+
+.swiper-button-next,
+.swiper-rtl .swiper-button-prev {
+	top: 50%;
+	right: 1.25rem;
+}
+
+.swiper-button-next:after,
+.swiper-rtl .swiper-button-prev:after {
+	content: "next";
+}
+
+.swiper:hover .swiper-button-next,
+.swiper:hover .swiper-button-prev {
+	opacity: 1 !important;
+}
+
+.swiper-scrollbar {
+	left: 0 !important;
+	width: 100% !important;
+}
+
+.swiper-scrollbar-drag {
+	width: 33.33% !important;
+	background-color: var(--main-accent-color);
+}
+
+.swiper:hover div.swiper-button-next.swiper-button-disabled,
+.swiper:hover div.swiper-button-prev.swiper-button-disabled {
+	opacity: 0 !important;
+}

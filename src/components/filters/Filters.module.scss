@@ -1,0 +1,95 @@
+.filters {
+	margin-bottom: 1rem !important;
+}
+
+.inner {
+	display: flex;
+	gap: 15px;
+	border-radius: 10px;
+	flex-wrap: wrap;
+}
+
+.filter {
+	position: relative;
+	cursor: default;
+	height: 100%;
+}
+
+.filterHeader {
+	background-color: var(--third-bg-color);
+	color: var(--main-text-color);
+	border-radius: 0.875rem;
+	padding: 0.75rem 1rem;
+	font-size: 16px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.filterContent {
+	position: absolute;
+	top: calc(100% + 0.5rem);
+	left: 0;
+	z-index: 10;
+	background-color: var(--main-bg-color);
+	border: none;
+	border-radius: 1.25rem;
+	padding: 1rem 2rem;
+	min-width: 18.5rem;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(-10px);
+	transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+	& > :not(:last-child) {
+		margin-bottom: 1rem;
+	}
+}
+
+.filterContentOpen {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.labelText {
+	font-size: 14px;
+	color: var(--main-text-color);
+}
+
+.slider .rc-slider-track {
+	background-color: var(--main-accent-color);
+}
+
+.slider .rc-slider-handle {
+	border: 2px solid var(--main-accent-color);
+	background-color: var(--main-bg-color);
+}
+
+.priceInputs {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.input {
+	padding: 10px;
+	border: 2px solid #ddd;
+	border-radius: 5px;
+	font-size: 14px;
+	width: 100%;
+}
+
+.buttonApply,
+.buttonReset {
+	padding: 10px 15px;
+	border: none;
+	border-radius: 5px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.buttonApply {
+	width: 100%;
+}
