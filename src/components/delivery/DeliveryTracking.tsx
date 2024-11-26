@@ -21,7 +21,7 @@ const DeliveryTracking: React.FC<DeliveryTrackingProps> = ({
 				href={trackingUrl}
 				target="_blank"
 				rel="noopener noreferrer"
-				className={classes.trackButton}
+				className={`main-btn ${classes.trackButton}`}
 			>
 				Отследить посылку
 			</a>

@@ -1,8 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import {
-	removeItemFromCart,
-} from "../../store/reducers/user/userSlice";
+import { removeItemFromCart } from "../../store/reducers/user/userSlice";
 import { useGetProductQuery } from "../../services/ProductServices";
 import classes from "./Cart.module.scss";
 import { Link } from "react-router-dom";
@@ -19,6 +17,7 @@ import {
 	removeFavorite,
 } from "../../store/reducers/favorites/favoriteActionCreator";
 import { addItemToCart } from "../../store/reducers/user/userActionCreator";
+import useDebounce from "../../hooks/useDeboune";
 
 interface CartItemProps {
 	item: ICartProduct;
@@ -38,11 +37,9 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 	);
 	const cart = useAppSelector((state) => state.userReducer.cart);
 	const isSelected = selectedItems.includes(item.id);
-	const { favorites, loadingItems } = useAppSelector((state) => state.favoritesReducer);
+	const { favorites } = useAppSelector((state) => state.favoritesReducer);
 	const { curUser } = useAppSelector((state) => state.userReducer);
 	const isFavorite = favorites.some((fav) => fav.id === item.id);
-	const isItemLoading = loadingItems[item.id];
-	const [isProcessing, setIsProcessing] = useState(false);
 
 	const [totalPriceSpring, totalPriceSpringApi] = useSpring(() => ({
 		number: 0,
@@ -62,6 +59,15 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 		})
 	);
 
+	const [quantity, setQuantity] = useState(item.quantity);
+	const debouncedQuantity = useDebounce(quantity, 500);
+
+	useEffect(() => {
+		if (debouncedQuantity !== item.quantity) {
+			changeQuantity(debouncedQuantity);
+		}
+	}, [debouncedQuantity]);
+
 	useEffect(() => {
 		const originalItemPrice = product?.price || 0;
 		const itemPrice = product?.discount
@@ -73,13 +79,13 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 			currency,
 			rates
 		);
-		const totalPrice = item.quantity * convertedPrice;
-		const originalTotalPrice = item.quantity * convertedOriginalPrice;
+		const totalPrice = quantity * convertedPrice;
+		const originalTotalPrice = quantity * convertedOriginalPrice;
 
 		totalPriceSpringApi.start({ number: totalPrice });
 		originalTotalPriceSpringApi.start({ number: originalTotalPrice });
 	}, [
-		item.quantity,
+		quantity,
 		product,
 		currency,
 		rates,
@@ -93,23 +99,30 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 				dispatch(removeItemFromCart(item.id));
 				return;
 			}
-			
+
 			const totalQuantityInCart = cart.reduce((sum, cartItem) => {
 				if (cartItem.id === item.id) {
 					return sum;
 				}
 				return sum + cartItem.quantity;
 			}, 0);
-			
+
 			if (totalQuantityInCart + newQuantity > 200) {
-				toast.warning('Превышен лимит товаров в корзине (максимум 200)');
+				toast.warning("Превышен лимит товаров в корзине (максимум 200)");
 				return;
 			}
-			
-			await dispatch(addItemToCart({ ...item, quantity: newQuantity })).unwrap();
+
+			await dispatch(
+				addItemToCart({ ...item, quantity: newQuantity })
+			).unwrap();
 		} catch (error) {
-			toast.error('Ошибка при изменении количества товара');
+			toast.error("Ошибка при изменении количества товара");
 		}
+	};
+
+	const handleQuantityChange = (newQuantity: number) => {
+		const validQuantity = Math.min(newQuantity, availableQuantity);
+		setQuantity(validQuantity);
 	};
 
 	const removeItem = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -131,17 +144,16 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 		return date.toLocaleDateString();
 	};
 
-	const handleFavoriteClick = async (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleFavoriteClick = async (
+		event: React.MouseEvent<HTMLButtonElement>
+	) => {
 		event.preventDefault();
 		if (!curUser) {
-			toast.warning("Авторизуйтесь, чтобы добавить товар в избранное");
+			toast.warning("Авторизуйтесь, чобы добавить товар в избранное");
 			return;
 		}
 
-		if (isProcessing) return;
-		
 		try {
-			setIsProcessing(true);
 			if (isFavorite) {
 				await dispatch(removeFavorite(item.id)).unwrap();
 				toast.info("Товар удален из избранного");
@@ -150,11 +162,25 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 				toast.success("Товар добавлен в избранное");
 			}
 		} catch (error) {
-			toast.error(typeof error === 'string' ? error : 'Ошибка при обновлении избранного');
-		} finally {
-			setIsProcessing(false);
+			toast.error(
+				typeof error === "string" ? error : "Ошибка при обновлении избранного"
+			);
 		}
 	};
+
+	const totalQuantityInCart = cart.reduce((sum, cartItem) => {
+		if (cartItem.id === item.id) {
+			return sum;
+		}
+		return sum + cartItem.quantity;
+	}, 0);
+
+	const maxQuantityConsideringCartLimit = 200 - totalQuantityInCart;
+
+	const availableQuantity = Math.min(
+		maxQuantityConsideringCartLimit,
+		product?.quantity || 0
+	);
 
 	return (
 		<Link to={`/products/${item.id}`} className={classes.item}>
@@ -193,23 +219,19 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 						type="button"
 						className={classes.favorite}
 						onClick={handleFavoriteClick}
-						disabled={isItemLoading || isProcessing}
 					>
 						{isFavorite ? (
 							<svg
 								fill="red"
 								width="20px"
 								height="20px"
-								
 								viewBox="0 0 36 36"
 								version="1.1"
 								preserveAspectRatio="xMidYMid meet"
 								xmlns="http://www.w3.org/2000/svg"
 							>
 								<title>heart-solid</title>
-								<path
-									d="M33,7.64c-1.34-2.75-5.2-5-9.69-3.69A9.87,9.87,0,0,0,18,7.72a9.87,9.87,0,0,0-5.31-3.77C8.19,2.66,4.34,4.89,3,7.64c-1.88,3.85-1.1,8.18,2.32,12.87C8,24.18,11.83,27.9,17.39,32.22a1,1,0,0,0,1.23,0c5.55-4.31,9.39-8,12.07-11.71C34.1,15.82,34.88,11.49,33,7.64Z"
-								></path>
+								<path d="M33,7.64c-1.34-2.75-5.2-5-9.69-3.69A9.87,9.87,0,0,0,18,7.72a9.87,9.87,0,0,0-5.31-3.77C8.19,2.66,4.34,4.89,3,7.64c-1.88,3.85-1.1,8.18,2.32,12.87C8,24.18,11.83,27.9,17.39,32.22a1,1,0,0,0,1.23,0c5.55-4.31,9.39-8,12.07-11.71C34.1,15.82,34.88,11.49,33,7.64Z"></path>
 								<rect x="0" y="0" width="36" height="36" fill-opacity="0" />
 							</svg>
 						) : (
@@ -248,13 +270,13 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 
 			<div className={classes.end}>
 				<QuantityInput
-					value={item.quantity}
-					onChange={(newQuantity) => changeQuantity(newQuantity)}
+					value={quantity}
+					onChange={handleQuantityChange}
 					min={1}
 					max={Math.min(200, product?.quantity || 0)}
 					isLoading={!product}
-					onIncrease={() => changeQuantity(item.quantity + 1)}
-					onDecrease={() => changeQuantity(item.quantity - 1)}
+					onIncrease={() => handleQuantityChange(quantity + 1)}
+					onDecrease={() => handleQuantityChange(quantity - 1)}
 					onRemove={() => {
 						dispatch(removeItemFromCart(item.id));
 						dispatch(removeItemSelection(item.id));
@@ -265,10 +287,11 @@ const CartItem: FC<CartItemProps> = ({ item, deliveryDays, isLoading }) => {
 							</>
 						);
 					}}
-					availableQuantity={product?.quantity}
+					availableQuantity={availableQuantity}
 					productTitle={item.title}
 					productId={item.id}
 					disableMinusAtMin={true}
+					disablePlusAtMax={quantity >= availableQuantity}
 				/>
 				<div className={classes.total}>
 					{loading ? (

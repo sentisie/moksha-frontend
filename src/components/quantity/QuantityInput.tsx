@@ -21,6 +21,9 @@ interface QuantityInputProps {
 	productTitle?: string;
 	disableMinusAtMin?: boolean;
 	productId: number;
+	disablePlusAtMax?: boolean;
+	cartCounter?: string;
+	isMaxReached?: boolean;
 }
 
 const QuantityInput: FC<QuantityInputProps> = ({
@@ -33,10 +36,12 @@ const QuantityInput: FC<QuantityInputProps> = ({
 	onIncrease,
 	onDecrease,
 	onRemove,
-	availableQuantity,
 	productTitle,
 	disableMinusAtMin = false,
 	productId,
+	disablePlusAtMax = false,
+	cartCounter,
+	isMaxReached = false,
 }) => {
 	const [inputValue, setInputValue] = useState(String(value));
 	const [isFocused, setIsFocused] = useState(false);
@@ -49,7 +54,15 @@ const QuantityInput: FC<QuantityInputProps> = ({
 	}, [value, isFocused]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newValue = e.target.value.replace(/[^\d]/g, "");
+		let newValue = e.target.value.replace(/[^\d]/g, "");
+
+		if (newValue) {
+			const numericValue = Number(newValue);
+			if (numericValue > max) {
+				newValue = String(max);
+			}
+		}
+
 		setInputValue(newValue);
 	};
 
@@ -74,66 +87,65 @@ const QuantityInput: FC<QuantityInputProps> = ({
 		}
 
 		if (newValue > max) {
-			if (availableQuantity && newValue > availableQuantity) {
-				toast.warning(
-					<>
-						<div>Недостаточно товаров на складе</div>
-						<div className="toast-details">
-							Доступно: {availableQuantity} шт.
-						</div>
-					</>
-				);
-				newValue = availableQuantity;
-			} else {
-				toast.warning(
-					<>
-						<div>Превышен лимит товаров в корзине</div>
-						<div className="toast-details">
-							Максимальное количество: {max} шт.
-						</div>
-					</>
-				);
-				newValue = max;
-			}
+			toast.warning(
+				<>
+					<div>Превышен лимит товаров в корзине</div>
+					<div className="toast-details">
+						Максимальное количество: {max} шт.
+					</div>
+				</>
+			);
+			newValue = max;
 		}
 
 		onChange(newValue);
 	};
 
 	return (
-		<div
-			className={classes.quantity}
-			onClick={(event) => event.preventDefault()}
-		>
-			<MyButton
-				className={classes.minus}
-				onClick={onDecrease}
-				disabled={disabled || (disableMinusAtMin && value <= min)}
+		<div className={classes.quantityWrapper}>
+			<div
+				className={classes.quantity}
+				onClick={(event) => event.preventDefault()}
 			>
-				-
-			</MyButton>
+				<MyButton
+					className={classes.minus}
+					onClick={onDecrease}
+					disabled={disabled || (disableMinusAtMin && value <= min)}
+				>
+					-
+				</MyButton>
 
-			{isLoading ? (
-				<Loader />
-			) : (
-				<input
-					type="text"
-					value={inputValue}
-					onChange={handleChange}
-					onFocus={() => setIsFocused(true)}
-					onBlur={handleBlur}
-					className={classes.input}
-					disabled={disabled}
-				/>
+				{isLoading ? (
+					<Loader />
+				) : (
+					<input
+						type="text"
+						value={inputValue}
+						onChange={handleChange}
+						onFocus={() => setIsFocused(true)}
+						onBlur={handleBlur}
+						className={classes.input}
+						disabled={disabled}
+					/>
+				)}
+
+				<MyButton
+					className={classes.plus}
+					onClick={onIncrease}
+					disabled={disabled || disablePlusAtMax}
+				>
+					+
+				</MyButton>
+			</div>
+			{cartCounter && (
+				<div
+					className={`${classes.cartCounter} ${
+						isMaxReached ? classes.maxReached : ""
+					}`}
+				>
+					{cartCounter}
+				</div>
 			)}
-
-			<MyButton
-				className={classes.plus}
-				onClick={onIncrease}
-				disabled={disabled}
-			>
-				+
-			</MyButton>
 		</div>
 	);
 };

@@ -314,3 +314,24 @@
 	align-items: center;
 	gap: 2rem;
 }
+
+.checkboxContainer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 15px 20px;
+	background-color: #fff;
+	border-radius: 8px;
+	margin-bottom: 15px;
+}
+
+.cartCounter {
+	font-size: 14px;
+	color: #666;
+	font-weight: 500;
+	
+	&.maxReached {
+		color: #ff4444;
+		font-weight: bold;
+	}
+}

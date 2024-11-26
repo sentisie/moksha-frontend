@@ -276,6 +276,14 @@ const Cart: FC = () => {
 		return Array.from(cartMap.values());
 	};
 
+	const [totalQuantityInCart, setTotalQuantityInCart] = useState(() =>
+		cart.reduce((sum, item) => sum + item.quantity, 0)
+	);
+
+	useEffect(() => {
+		setTotalQuantityInCart(cart.reduce((sum, item) => sum + item.quantity, 0));
+	}, [cart]);
+
 	return (
 		<section className={classes.cart}>
 			<div className="container">
@@ -298,15 +306,20 @@ const Cart: FC = () => {
 						<div className={classes.cartContent}>
 							<div className={classes.cartTop}>
 								<div className={classes.items}>
-									<div className={classes.checkbox}>
-										<label>
-											<input
-												type="checkbox"
-												checked={selectedItems.length === cart.length}
-												onChange={handleSelectAll}
-											/>
-											<span>Выбрать все</span>
-										</label>
+									<div className={classes.checkboxContainer}>
+										<div className={classes.checkbox}>
+											<label>
+												<input
+													type="checkbox"
+													checked={selectedItems.length === cart.length}
+													onChange={handleSelectAll}
+												/>
+												<span>Выбрать все</span>
+											</label>
+										</div>
+										<div className={`${classes.cartCounter} ${totalQuantityInCart >= 200 ? classes.maxReached : ''}`}>
+											{totalQuantityInCart}/200
+										</div>
 									</div>
 									{cart.map((item) => {
 										const deliveryInfo = deliveryData?.find(

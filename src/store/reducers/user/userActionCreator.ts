@@ -57,21 +57,21 @@ export const loginUser = createAsyncThunk<
 	}
 });
 
-export const updateUser = createAsyncThunk<
-	IUser,
-	{ rejectValue: string }
->("users/updateUser", async (payload, thunkAPI) => {
-	try {
-		const response = await axios.put(`${BASE_URL}/auth/profile`, payload);
-		return response.data;
-	} catch (err: unknown) {
-		let errorMessage = "Ошибка при обновлении пользователя";
-		if (axios.isAxiosError(err)) {
-			errorMessage = err.response?.data?.error || errorMessage;
+export const updateUser = createAsyncThunk<IUser, { rejectValue: string }>(
+	"users/updateUser",
+	async (payload, thunkAPI) => {
+		try {
+			const response = await axios.put(`${BASE_URL}/auth/profile`, payload);
+			return response.data;
+		} catch (err: unknown) {
+			let errorMessage = "Ошибка при обновлении пользователя";
+			if (axios.isAxiosError(err)) {
+				errorMessage = err.response?.data?.error || errorMessage;
+			}
+			return thunkAPI.rejectWithValue(errorMessage);
 		}
-		return thunkAPI.rejectWithValue(errorMessage);
 	}
-});
+);
 
 export const checkAuth = createAsyncThunk(
 	"users/checkAuth",
@@ -245,39 +245,46 @@ export const updateProfile = createAsyncThunk(
 );
 
 export const addItemToCart = createAsyncThunk(
-	'user/addItemToCart',
+	"user/addItemToCart",
 	async (item: ICartProduct, { getState, rejectWithValue }) => {
 		try {
 			const { userReducer } = getState() as RootState;
 			const currentCart = userReducer.cart;
-			
-			const totalQuantity = currentCart.reduce((sum, cartItem) => 
-				sum + (cartItem.id === item.id ? 0 : cartItem.quantity), 
-				0) + item.quantity;
-			
+
+			const totalQuantity =
+				currentCart.reduce(
+					(sum, cartItem) =>
+						sum + (cartItem.id === item.id ? 0 : cartItem.quantity),
+					0
+				) + item.quantity;
+
 			if (totalQuantity > 200) {
-				throw new Error('Превышен лимит товаров в корзине (максимум 200)');
+				throw new Error("Превышен лимит товаров в корзине (максимум 200)");
 			}
-			
-			const existingItemIndex = currentCart.findIndex(cartItem => cartItem.id === item.id);
-			const newCart = existingItemIndex !== -1
-				? currentCart.map(cartItem => 
-					cartItem.id === item.id ? item : cartItem)
-				: [...currentCart, item];
-			
-			localStorage.setItem('cart', JSON.stringify(newCart));
-			
-			const token = localStorage.getItem('token');
+
+			const existingItemIndex = currentCart.findIndex(
+				(cartItem) => cartItem.id === item.id
+			);
+			const newCart =
+				existingItemIndex !== -1
+					? currentCart.map((cartItem) =>
+							cartItem.id === item.id ? item : cartItem
+					  )
+					: [...currentCart, item];
+
+			localStorage.setItem("cart", JSON.stringify(newCart));
+
+			const token = localStorage.getItem("token");
 			if (token) {
 				await axios.post(`${BASE_URL}/cart`, { cart: newCart });
 			}
-			
+
 			return item;
 		} catch (error) {
 			if (error instanceof Error) {
 				return rejectWithValue(error.message);
 			}
-			return rejectWithValue('Ошибка при добавлении товара в корзину');
+			return rejectWithValue("Ошибка при добавлении товара в корзину");
 		}
 	}
 );
